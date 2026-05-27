@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Server Dashboard</title>
+  <link rel="stylesheet" href="/style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🖥️</text></svg>" />
+</head>
+<body>
+
+<!-- Top bar -->
+<div id="topbar">
+  <div>
+    <div class="hostname" id="hostname">—</div>
+    <div class="addresses" id="addresses"></div>
+  </div>
+  <div class="spacer"></div>
+  <div style="text-align:right">
+    <div class="clock" id="clock">—</div>
+    <div class="updated">Updated <span id="last-updated">—</span></div>
+  </div>
+  <div id="status-badge" class="stale">STALE</div>
+</div>
+
+<!-- Row 1: CPU / Memory / Swap -->
+<div class="grid grid-3 section-gap">
+  <div class="card">
+    <div class="card-title">CPU</div>
+    <div class="gauge-wrap">
+      <svg class="gauge-svg" width="80" height="80" viewBox="0 0 80 80">
+        <circle class="gauge-ring-bg" cx="40" cy="40" r="30" fill="none" stroke-width="7"/>
+        <circle id="cpu-ring" class="gauge-ring" cx="40" cy="40" r="30" fill="none" stroke-width="7"
+          stroke-dasharray="188.5" stroke-dashoffset="188.5" transform="rotate(-90 40 40)" stroke="var(--green)"/>
+        <text id="cpu-ring-text" class="gauge-text" x="40" y="40" fill="var(--text)" font-size="13" font-weight="700">0%</text>
+      </svg>
+      <div class="gauge-info">
+        <div class="gauge-label">Overall usage</div>
+        <div class="gauge-value c-green" id="cpu-pct">0%</div>
+        <div class="gauge-sub" id="cpu-sub">— cores · — MHz</div>
+        <div class="sparkline-wrap">
+          <svg class="sparkline" id="cpu-spark" viewBox="0 0 60 36" preserveAspectRatio="none">
+            <polygon class="spark-fill" id="cpu-spark-fill" points="" fill="var(--green)"/>
+            <polyline id="cpu-spark-line" points="" stroke="var(--green)"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Memory</div>
+    <div class="gauge-wrap">
+      <svg class="gauge-svg" width="80" height="80" viewBox="0 0 80 80">
+        <circle class="gauge-ring-bg" cx="40" cy="40" r="30" fill="none" stroke-width="7"/>
+        <circle id="mem-ring" class="gauge-ring" cx="40" cy="40" r="30" fill="none" stroke-width="7"
+          stroke-dasharray="188.5" stroke-dashoffset="188.5" transform="rotate(-90 40 40)" stroke="var(--green)"/>
+        <text id="mem-ring-text" class="gauge-text" x="40" y="40" fill="var(--text)" font-size="13" font-weight="700">0%</text>
+      </svg>
+      <div class="gauge-info">
+        <div class="gauge-label">RAM usage</div>
+        <div class="gauge-value c-green" id="mem-pct">0%</div>
+        <div class="gauge-sub" id="mem-sub">— / —</div>
+        <div class="sparkline-wrap">
+          <svg class="sparkline" id="mem-spark" viewBox="0 0 60 36" preserveAspectRatio="none">
+            <polygon class="spark-fill" id="mem-spark-fill" points="" fill="var(--blue)"/>
+            <polyline id="mem-spark-line" points="" stroke="var(--blue)"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Swap &amp; System</div>
+    <div class="stat-row">
+      <span class="stat-label">Swap used</span>
+      <span class="stat-value" id="swap-pct">—</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Swap total</span>
+      <span class="stat-value" id="swap-total">—</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Load avg (1m)</span>
+      <span class="stat-value" id="load-1">—</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Load avg (5m)</span>
+      <span class="stat-value" id="load-5">—</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Load avg (15m)</span>
+      <span class="stat-value" id="load-15">—</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Uptime</span>
+      <span class="stat-value" id="uptime">—</span>
+    </div>
+  </div>
+</div>
+
+<!-- Row 2: Temp (hidden if unavailable) + Disk -->
+<div class="grid grid-4 section-gap">
+  <div class="card hidden" id="temp-card">
+    <div class="card-title">Temperature</div>
+    <div id="temp-content"></div>
+  </div>
+  <div class="card" id="disk-card" style="grid-column: span 4;">
+    <div class="card-title">Disk Usage</div>
+    <div id="disk-content"></div>
+  </div>
+</div>
+
+<!-- Row 3: Network + Top Processes -->
+<div class="grid grid-2 section-gap">
+  <div class="card">
+    <div class="card-title">Network I/O</div>
+    <div id="net-content"><span class="c-muted">Loading…</span></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Top Processes — CPU</div>
+    <table class="proc-table" id="proc-cpu-table">
+      <thead><tr><th>Process</th><th>PID</th><th>CPU%</th><th>Mem%</th></tr></thead>
+      <tbody id="proc-cpu-body"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Row 4: Top Processes — Memory -->
+<div class="grid grid-2 section-gap">
+  <div class="card">
+    <div class="card-title">Top Processes — Memory</div>
+    <table class="proc-table" id="proc-mem-table">
+      <thead><tr><th>Process</th><th>PID</th><th>CPU%</th><th>Mem%</th></tr></thead>
+      <tbody id="proc-mem-body"></tbody>
+    </table>
+  </div>
+  <div class="card">
+    <div class="card-title">CPU Cores</div>
+    <div id="cores-content"></div>
+  </div>
+</div>
+
+<!-- Row 5: Docker Containers -->
+<div class="card section-gap">
+  <div class="card-title">Docker Containers</div>
+  <div id="containers-content"><span class="c-muted">Loading…</span></div>
+</div>
+
+<script src="/app.js"></script>
+</body>
+</html>
