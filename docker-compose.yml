@@ -7,5 +7,7 @@ services:
       - PORT=8000
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /media:/media:ro
+      - /mnt:/mnt:ro
     restart: unless-stopped
     pid: host

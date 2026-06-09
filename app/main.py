@@ -188,21 +188,39 @@ def get_stats():
     mem = psutil.virtual_memory()
     swap = psutil.swap_memory()
 
-    # Disk
+    # Disk — include bind/network mounts under /media and /mnt
+    _SKIP_FSTYPES = {"squashfs", "tmpfs", "devtmpfs", "overlay", "aufs", "nsfs", "proc", "sysfs", "cgroup", "cgroup2", ""}
+    seen_mountpoints = set()
     disks = []
-    for part in psutil.disk_partitions(all=False):
+
+    def _add_disk(mountpoint, fstype=""):
+        if mountpoint in seen_mountpoints:
+            return
+        seen_mountpoints.add(mountpoint)
         try:
-            usage = psutil.disk_usage(part.mountpoint)
+            usage = psutil.disk_usage(mountpoint)
             disks.append({
-                "mountpoint": part.mountpoint,
-                "fstype": part.fstype,
+                "mountpoint": mountpoint,
+                "fstype": fstype,
                 "total": usage.total,
                 "used": usage.used,
                 "free": usage.free,
                 "percent": usage.percent,
             })
-        except PermissionError:
+        except (PermissionError, OSError):
+            pass
+
+    for part in psutil.disk_partitions(all=False):
+        if part.fstype not in _SKIP_FSTYPES:
+            _add_disk(part.mountpoint, part.fstype)
+
+    for base in ("/media", "/mnt"):
+        if not os.path.isdir(base):
             continue
+        for name in os.listdir(base):
+            path = os.path.join(base, name)
+            if os.path.ismount(path):
+                _add_disk(path)
 
     # Network delta
     net_io = psutil.net_io_counters(pernic=True)
