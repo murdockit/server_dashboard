@@ -5,21 +5,30 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Server Dashboard</title>
   <link rel="stylesheet" href="/style.css" />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🖥️</text></svg>" />
+  <link id="favicon" rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🖥️</text></svg>" />
 </head>
 <body>
 
 <!-- Top bar -->
 <div id="topbar">
-  <div>
+  <div class="topbar-left">
     <div class="hostname" id="hostname">—</div>
     <div class="addresses" id="addresses"></div>
   </div>
   <div class="spacer"></div>
-  <div style="text-align:right">
+  <div class="topbar-right">
     <div class="clock" id="clock">—</div>
     <div class="updated">Updated <span id="last-updated">—</span></div>
   </div>
+  <select id="interval-select" title="Refresh interval">
+    <option value="1000">1s</option>
+    <option value="5000" selected>5s</option>
+    <option value="15000">15s</option>
+    <option value="30000">30s</option>
+    <option value="60000">60s</option>
+  </select>
+  <button id="refresh-btn" title="Refresh now (R)">↺</button>
+  <button id="theme-btn" title="Toggle light/dark theme">Light</button>
   <div id="status-badge" class="stale">STALE</div>
 </div>
 
@@ -115,15 +124,17 @@
 <!-- Row 3: Network + Top Processes -->
 <div class="grid grid-2 section-gap">
   <div class="card">
-    <div class="card-title">Network I/O</div>
+    <div class="card-title">Network I/O <button id="net-filter-btn" class="title-btn" title="Show virtual interfaces">all</button></div>
     <div id="net-content"><span class="c-muted">Loading…</span></div>
   </div>
   <div class="card">
     <div class="card-title">Top Processes — CPU</div>
-    <table class="proc-table" id="proc-cpu-table">
-      <thead><tr><th>Process</th><th>PID</th><th>CPU%</th><th>Mem%</th></tr></thead>
-      <tbody id="proc-cpu-body"></tbody>
-    </table>
+    <div class="table-scroll">
+      <table class="proc-table" id="proc-cpu-table">
+        <thead><tr><th>Process</th><th>PID</th><th>CPU%</th><th>Mem%</th></tr></thead>
+        <tbody id="proc-cpu-body"></tbody>
+      </table>
+    </div>
   </div>
 </div>
 
@@ -131,10 +142,12 @@
 <div class="grid grid-2 section-gap">
   <div class="card">
     <div class="card-title">Top Processes — Memory</div>
-    <table class="proc-table" id="proc-mem-table">
-      <thead><tr><th>Process</th><th>PID</th><th>CPU%</th><th>Mem%</th></tr></thead>
-      <tbody id="proc-mem-body"></tbody>
-    </table>
+    <div class="table-scroll">
+      <table class="proc-table" id="proc-mem-table">
+        <thead><tr><th>Process</th><th>PID</th><th>CPU%</th><th>Mem%</th></tr></thead>
+        <tbody id="proc-mem-body"></tbody>
+      </table>
+    </div>
   </div>
   <div class="card">
     <div class="card-title">CPU Cores</div>
@@ -144,7 +157,7 @@
 
 <!-- Row 5: Docker Containers -->
 <div class="card section-gap">
-  <div class="card-title">Docker Containers</div>
+  <div class="card-title">Docker Containers <span id="container-count" class="c-muted" style="font-size:10px;font-weight:500;text-transform:none;letter-spacing:0"></span></div>
   <div id="containers-content"><span class="c-muted">Loading…</span></div>
 </div>
 

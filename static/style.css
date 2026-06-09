@@ -163,8 +163,7 @@ body { padding: 16px; }
 .c-blue { color: var(--blue); }
 .c-muted { color: var(--muted); }
 
-/* ── Temp card ── */
-#temp-card { display: none; }
+/* ── Temp card ── starts hidden via .hidden class, shown by JS when data available ── */
 
 /* ── Network rates ── */
 .net-iface { font-weight: 600; margin-bottom: 4px; font-size: 12px; }
@@ -179,3 +178,156 @@ body { padding: 16px; }
 
 /* ── Section label ── */
 .section-gap { margin-top: 6px; }
+
+/* ── Topbar left/right groups ── */
+.topbar-left { min-width: 0; }
+.topbar-right { text-align: right; }
+
+/* ── Refresh button ── */
+#refresh-btn {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  padding: 4px 9px;
+  transition: color 0.2s, background 0.2s;
+  flex-shrink: 0;
+}
+#refresh-btn:hover { background: var(--surface2); color: var(--text); }
+#refresh-btn:active { opacity: 0.7; }
+#refresh-btn.spinning { animation: btn-spin 0.5s linear; }
+@keyframes btn-spin { to { transform: rotate(360deg); } }
+
+/* ── Table scroll wrapper ── */
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+/* ── Responsive: tablet (601–960px) ── */
+@media (max-width: 960px) {
+  .grid-3 { grid-template-columns: repeat(2, 1fr); }
+  .grid-4 { grid-template-columns: repeat(2, 1fr); }
+  #disk-card { grid-column: 1 / -1 !important; }
+}
+
+/* ── Responsive: mobile (≤600px) ── */
+@media (max-width: 600px) {
+  body { padding: 8px; }
+
+  #topbar { flex-wrap: wrap; padding: 10px 14px; gap: 8px; }
+  #topbar .spacer { display: none; }
+  #topbar .hostname { font-size: 15px; }
+  #topbar .clock { font-size: 15px; }
+
+  .grid-3, .grid-2, .grid-4 { grid-template-columns: 1fr !important; }
+  #disk-card, #temp-card { grid-column: 1 !important; }
+
+  .gauge-value { font-size: 16px; }
+  .section-gap { margin-top: 4px; }
+
+  /* Hide image column in container table to save horizontal space */
+  .ct-table .col-image { display: none; }
+
+  .ct-image { max-width: 120px; }
+  .proc-name { max-width: 100px; }
+}
+
+/* ── Card-title: flex row so buttons align to the right ── */
+.card-title { display: flex; align-items: center; gap: 6px; }
+
+/* ── Collapse button ── */
+.collapse-btn {
+  margin-left: auto;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 0 5px 2px;
+  flex-shrink: 0;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.collapse-btn:hover { color: var(--text); background: var(--surface2); }
+
+/* ── Collapsed card: hide everything after the title ── */
+.card.collapsed > *:not(.card-title) { display: none; }
+.card.collapsed .card-title { margin-bottom: 0; }
+
+/* ── Title button (e.g. network interface filter) ── */
+.title-btn {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 1px 6px;
+  text-transform: none;
+  transition: color 0.2s, background 0.2s, border-color 0.2s;
+}
+.title-btn:hover { color: var(--text); background: var(--surface2); }
+.title-btn.active { color: var(--accent); border-color: var(--accent); }
+
+/* ── Sortable proc table headers ── */
+.proc-table th { cursor: pointer; user-select: none; }
+.proc-table th.sort-active { color: var(--text); }
+.sort-ind { margin-left: 3px; font-size: 10px; color: var(--accent); }
+
+/* ── Clickable address chips ── */
+.addr-item { cursor: pointer; transition: color 0.15s; border-radius: 3px; }
+.addr-item:hover { color: var(--text); }
+.addr-item.addr-copied { color: var(--green) !important; }
+
+/* ── Interval select ── */
+#interval-select {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  cursor: pointer;
+  font-size: 12px;
+  padding: 4px 6px;
+  flex-shrink: 0;
+}
+#interval-select:focus { outline: none; border-color: var(--accent); }
+
+/* ── Theme toggle button ── */
+#theme-btn {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 8px;
+  transition: color 0.2s, background 0.2s;
+  flex-shrink: 0;
+}
+#theme-btn:hover { background: var(--surface2); color: var(--text); }
+
+/* ── Light theme ── */
+body.light {
+  --bg: #f1f5f9;
+  --surface: #ffffff;
+  --surface2: #f8fafc;
+  --border: #e2e8f0;
+  --text: #0f172a;
+  --muted: #64748b;
+}
+body.light .state-running    { background: #dcfce7; color: #15803d; }
+body.light .state-exited     { background: #f1f5f9; color: var(--muted); }
+body.light .state-paused     { background: #fef3c7; color: #a16207; }
+body.light .state-restarting { background: #ede9fe; color: #7c3aed; }
+body.light .state-created    { background: #dbeafe; color: #1d4ed8; }
+body.light .state-dead       { background: #fee2e2; color: #dc2626; }
+body.light #status-badge.live  { background: #dcfce7; color: #15803d; }
+body.light #status-badge.stale { background: #fee2e2; color: #dc2626; }
+body.light #interval-select { background: var(--surface2); }
