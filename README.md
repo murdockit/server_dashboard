@@ -66,8 +66,9 @@ ports:
 
 ## Requirements
 
-- Docker with the Docker socket accessible at `/var/run/docker.sock`
+- A read-only [Docker socket proxy](https://docs.linuxserver.io/images/docker-socket-proxy/) reachable as `socket-proxy:2375` on an external Docker network named `socket-proxy`, allowing `CONTAINERS=1` and `IMAGES=1` with `POST=0`. The dashboard talks to it via `DOCKER_HOST` instead of mounting `/var/run/docker.sock`; start the proxy before running `docker compose up`.
 - The container runs with `pid: host` so `psutil` can read host-level process and CPU stats
+- The app runs as an unprivileged user (uid 1000) inside the container
 
 ## Project Structure
 

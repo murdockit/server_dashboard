@@ -5,9 +5,17 @@ services:
       - "80:8000"
     environment:
       - PORT=8000
+      # Docker API via the read-only proxy (see ~/socket-proxy), not the raw socket.
+      - DOCKER_HOST=tcp://socket-proxy:2375
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
       - /media:/media:ro
       - /mnt:/mnt:ro
+    networks:
+      - default
+      - socket-proxy
     restart: unless-stopped
     pid: host
+
+networks:
+  socket-proxy:
+    external: true
